@@ -19,6 +19,7 @@ libraryDependencies ++= Seq(
   // JSON (De)Serialization Libraries
   "com.google.code.gson" % "gson" % "2.8.5",
   "net.liftweb" %% "lift-json" % "3.3.0",
+  "com.fasterxml.jackson.module" %% "jackson-module-scala" % "2.9.10",
 
   // Scalatest testing framework
   "org.scalatest" %% "scalatest" % "3.0.8" % "test"

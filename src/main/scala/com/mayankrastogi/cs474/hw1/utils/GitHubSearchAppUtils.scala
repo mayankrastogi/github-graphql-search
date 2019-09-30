@@ -4,7 +4,7 @@ import com.mayankrastogi.cs474.hw1.github.enums.SearchType
 import com.mayankrastogi.cs474.hw1.github.enums.SearchType.SearchType
 import com.mayankrastogi.cs474.hw1.github.interfaces.SearchResult
 import com.mayankrastogi.cs474.hw1.github.objects.{Repository, RepositorySearchResult, User, UserSearchResult}
-import com.mayankrastogi.cs474.hw1.graphql.json.factories.LiftJsonConverterFactory
+import com.mayankrastogi.cs474.hw1.graphql.json.factories.JacksonJsonConverterFactory
 import com.mayankrastogi.cs474.hw1.graphql.{GraphQLClient, Query, QueryResult}
 import com.typesafe.scalalogging.LazyLogging
 
@@ -25,7 +25,8 @@ object GitHubSearchAppUtils extends LazyLogging {
       .newBuilder
       .apiEndpoint(endpoint)
       //      .jsonConverter(GsonJsonConverterFactory.create)
-      .jsonConverter(LiftJsonConverterFactory.create)
+      //      .jsonConverter(LiftJsonConverterFactory.create)
+      .jsonConverter(JacksonJsonConverterFactory.create)
       .headersPopulator { _ =>
         Map(
           "Authorization" -> s"Bearer $token",
