@@ -5,10 +5,10 @@ import com.typesafe.config.{Config, ConfigFactory}
 import scala.jdk.CollectionConverters._
 
 /**
-  * Maps and holds configuration read from config files for easy access.
-  *
-  * @param config The { @link Config} object that holds parameters read from a config file
-  */
+ * Maps and holds configuration read from config files for easy access.
+ *
+ * @param config The { @link Config} object that holds parameters read from a config file
+ */
 class Settings(config: Config) {
 
   // Validate provided config file against the reference (default) config file.
@@ -17,7 +17,14 @@ class Settings(config: Config) {
 
   // Application settings
 
+  /**
+   * URL of the GitHub GraphQL API server
+   */
   val apiEndpoint: String = getString("api-endpoint")
+  /**
+   * Number of results to fetch at a time
+   */
+  val numberOfResultsInPage: Int = getInt("number-of-results-in-page")
 
   // ===================================================================================================================
   // Private Helpers
