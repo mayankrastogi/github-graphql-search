@@ -2,7 +2,7 @@ package com.mayankrastogi.cs474.hw1.utils
 
 import com.typesafe.config.{Config, ConfigFactory}
 
-import scala.jdk.CollectionConverters._
+import scala.collection.JavaConverters._
 
 /**
  * Maps and holds configuration read from config files for easy access.
