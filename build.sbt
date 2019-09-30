@@ -16,8 +16,9 @@ libraryDependencies ++= Seq(
   // ScalaJ Http Client
   "org.scalaj" %% "scalaj-http" % "2.4.2",
 
-  // GSON JSON (De)Serialization Library
+  // JSON (De)Serialization Libraries
   "com.google.code.gson" % "gson" % "2.8.5",
+  "net.liftweb" %% "lift-json" % "3.3.0",
 
   // Scalatest testing framework
   "org.scalatest" %% "scalatest" % "3.0.8" % "test"
