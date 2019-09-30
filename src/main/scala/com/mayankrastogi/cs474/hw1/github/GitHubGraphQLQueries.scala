@@ -31,6 +31,26 @@ object GitHubGraphQLQueries {
         |        name
         |        nameWithOwner
         |        description
+        |        watchers {
+        |          totalCount
+        |        }
+        |        stargazers {
+        |          totalCount
+        |        }
+        |        languages(first: 100) {
+        |          nodes {
+        |            name
+        |          }
+        |        }
+        |        repositoryTopics(first: 100) {
+        |          nodes {
+        |            topic {
+        |              name
+        |            }
+        |          }
+        |        }
+        |        sshUrl
+        |        url
         |      }
         |    }
         |  }
@@ -78,10 +98,38 @@ object GitHubGraphQLQueries {
         |        following {
         |          totalCount
         |        }
-        |        repositories {
+        |        repositories(first: 100) {
+        |          nodes {
+        |            languages(first: 100) {
+        |              nodes {
+        |                name
+        |              }
+        |            }
+        |            repositoryTopics(first: 100) {
+        |              nodes {
+        |                topic {
+        |                  name
+        |                }
+        |              }
+        |            }
+        |          }
         |          totalCount
         |        }
-        |        repositoriesContributedTo {
+        |        repositoriesContributedTo(first: 100) {
+        |          nodes {
+        |            languages(first: 100) {
+        |              nodes {
+        |                name
+        |              }
+        |            }
+        |            repositoryTopics(first: 100) {
+        |              nodes {
+        |                topic {
+        |                  name
+        |                }
+        |              }
+        |            }
+        |          }
         |          totalCount
         |        }
         |      }

@@ -100,6 +100,12 @@ object GitHubSearchAppUtils extends LazyLogging {
          |Name: ${repo.name}
          |Owner: ${repo.nameWithOwner.split("/").head}
          |Description: ${repo.description}
+         |Watchers: ${repo.watchers.totalCount.getOrElse(0)}
+         |Stargazers: ${repo.stargazers.totalCount.getOrElse(0)}
+         |Languages: ${repo.languages.nodes.map(_.name).mkString(", ")}
+         |Topics: ${repo.repositoryTopics.nodes.map(_.topic.name).mkString(", ")}
+         |GitHub URL: ${repo.url}
+         |Clone URL: ${repo.sshUrl}
          |""".stripMargin)
   }
 
@@ -109,6 +115,14 @@ object GitHubSearchAppUtils extends LazyLogging {
    * @param user The user object.
    */
   def printUserDetails(user: User): Unit = {
+
+    // Consider all repositories (owned + collaborated-on) for languages and topics analysis
+    val allRepositories = user.repositories.nodes ++ user.repositoriesContributedTo.nodes
+
+    // Extract all unique languages and topics from the list of all repositories
+    val languages = allRepositories.flatMap(_.languages.nodes.map(_.name)).toSet.mkString(", ")
+    val topics = allRepositories.flatMap(_.repositoryTopics.nodes.map(_.topic.name)).toSet.mkString(", ")
+
     println(
       s"""
          |Name: ${user.name}
@@ -118,6 +132,9 @@ object GitHubSearchAppUtils extends LazyLogging {
          |Following: ${user.following.totalCount.getOrElse(0)}
          |Repositories Owned: ${user.repositories.totalCount.getOrElse(0)}
          |Repositories Collaborated On: ${user.repositoriesContributedTo.totalCount.getOrElse(0)}
+         |Languages Used: $languages
+         |Topics Interested In: $topics
+         |Profile URL: ${user.url}
          |""".stripMargin)
   }
 }
