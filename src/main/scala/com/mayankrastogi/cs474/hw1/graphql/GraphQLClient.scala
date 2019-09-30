@@ -1,5 +1,6 @@
 package com.mayankrastogi.cs474.hw1.graphql
 
+import com.mayankrastogi.cs474.hw1.graphql.json.JsonConverter
 import com.typesafe.scalalogging.LazyLogging
 import scalaj.http.Http
 
@@ -24,7 +25,7 @@ class GraphQLClient(val apiEndpoint: String,
    * @tparam T The type of "data" expected to be returned from the server in response to the `query`.
    * @return A [[QueryResult]] containing the `data` in the expected type `T`.
    */
-  def executeQuery[T](query: Query[T]): QueryResult[T] = {
+  def executeQuery[T: Manifest](query: Query[T]): QueryResult[T] = {
     logger.trace(s"query(query: $query")
 
     // Get the headers to be added to this query; Add default headers if the lambda is not provided
@@ -46,7 +47,7 @@ class GraphQLClient(val apiEndpoint: String,
     logger.debug(s"Got response: $response")
 
     // Deserialize the JSON response from the server into the expected format
-    jsonConverter.deserialize(response.body, classOf[QueryResult[T]])
+    jsonConverter.deserialize[QueryResult[T]](response.body)
   }
 }
 
