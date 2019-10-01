@@ -1,5 +1,6 @@
 package com.mayankrastogi.cs474.hw1.graphql.json.factories
 
+import com.fasterxml.jackson.annotation.JsonInclude.Include
 import com.fasterxml.jackson.databind.ObjectMapper
 import com.fasterxml.jackson.module.scala.DefaultScalaModule
 import com.fasterxml.jackson.module.scala.experimental.ScalaObjectMapper
@@ -20,6 +21,7 @@ object JacksonJsonConverterFactory extends JsonConverterFactory {
   override def create: JsonConverter = {
     val mapper = new ObjectMapper() with ScalaObjectMapper
     mapper.registerModule(DefaultScalaModule)
+    mapper.setSerializationInclusion(Include.NON_NULL)
     new JacksonJsonConverter(mapper)
   }
 }
