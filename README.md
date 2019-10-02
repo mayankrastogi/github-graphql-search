@@ -1,88 +1,443 @@
-# Homework 1
-### Description: object-oriented design and implementation of a [GraphQL](https://graphql.org/) client for [Github](https://github.com/).
-### Grade: 7% + bonus up to 3%
-#### You can obtain this Git repo using the command git clone git clone https://bitbucket.org/cs474_fall2019/homework1.git.
+## CS 474 - Object Oriented Languages and Environments
+## Homework 1 - GitHub Search Application using GraphQL API
 
-## Preliminaries
-As part of  homework assignment you will gain experience with creating and managing your Git repository, learning GraphQL and the data model of Github, creating your own model and the object-oriented design of a subset of the Github GraphQL model, creating JUnit tests, and creating your SBT or Gradle build and run scripts for your GraphQL client application. Doing this homework is essential for successful completion of the rest of this course, since all other homeworks and the course project will share the same features of this homework: branching, merging, committing, pushing your code into your Git repo, creating test cases and build scripts, and using various tools for diagnosing problems with your applications.
+---
 
-First things first, you must create your account at [BitBucket](https://bitbucket.org/), a Git repo management system. It is imperative that you use your UIC email account that has the extension @uic.edu. Once you create an account with your UIC address, BibBucket will assign you an academic status that allows you to create private repos. Bitbucket users with free accounts cannot create private repos, which are essential for submitting your homeworks and the course project. Your instructor created a team for this class named [cs474_Fall2019](https://bitbucket.org/cs474_fall2019/). Please contact your TA, [Mr. Aditya Gupta](agupt24@uic.edu) using your UIC.EDU email account and he will add you to the team repo as developers, since Mr.Gupta already has the admin privileges. Please use your emails from the class registration roster to add you to the team and you will receive an invitation from BitBucket to join the team. Since it is a large class, please use your UIC email address for communications or Piazza and avoid emails from other accounts like funnybunny1992@gmail.com. If you don't receive a response within 12 hours, please contact us via Piazza, it may be a case that your direct emails went to the spam folder.
+### Overview
 
-Next, if you haven't done so, you will install [IntelliJ](https://www.jetbrains.com/student/) with your academic license, the JDK, the Scala runtime and the IntelliJ Scala plugin, the [Simple Build Toolkit (SBT)](https://www.scala-sbt.org/1.x/docs/index.html) or the [Gradle build tool](https://gradle.org/) and make sure that you can create, compile, and run Java and Scala programs. Please make sure that you can run [various Java tools from your chosen JDK](https://docs.oracle.com/en/java/javase/index.html).
+The objective of this homework was to design a client program that consumes GitHub's GraphQL API leveraging object orientation techniques and design patterns taught in the course.
 
-In this and all consecutive homeworks and in the course project you will use logging and configuration management frameworks. You will comment your code extensively and supply logging statements at different logging levels (e.g., TRACE, INFO, ERROR) to record information at some salient points in the executions of your programs. All input and configuration variables must be supplied through configuration files -- hardcoding these values in the source code is generally prohibited and will be punished by taking a large percentage of points from your total grade! You are expected to use [Logback](https://logback.qos.ch/) and [SLFL4J](https://www.slf4j.org/) for logging and [Typesafe Conguration Library](https://github.com/lightbend/config) for managing configuration files. These and other libraries should be imported into your project using your script [build.sbt](https://www.scala-sbt.org/1.0/docs/Basic-Def-Examples.html) or [gradle script](https://docs.gradle.org/current/userguide/writing_build_scripts.html). These libraries and frameworks are widely used in the industry, so learning them is the time well spent to improve your resumes.
+My implementation for this homework is a **GitHub Search Application** that allows users to search GitHub for users and repositories. The application displays 5 search results at a time *(configurable)*. The user is allowed to keep on viewing the next set of results until either all the search results have been viewed, or the user wants to quit viewing the results.
 
-Even though you can implement your homework in Java, you can also use Scala, for which you will receive an additional bonus of up to 3% for fully pure functional (not imperative) implementation. You will be expected to learn Scala as you go. As you see from the StackOverflow survey, knowledge of Scala is highly paid and in great demand, and it is expected that you pick it relatively fast, especially since it is tightly integrated with Java. I recommend using the book on Programming in Scala: Updated for Scala 2.12 published on May 10, 2016 by Martin Odersky and Lex Spoon. You can obtain this book using the academic subscription on Safari Books Online. There are many other books and resources available on the Internet to learn Scala. Those who know more about functional programming can use the book on Functional Programming in Scala published on Sep 14, 2014 by Paul Chiusano and Runar Bjarnason.
+The application design leverages the use of **Builder**, **Factory**, **Adapter**, and **Dependency Injection** design patterns. The **Singleton** design pattern is also used multiple times by means of `object`s in Scala.
 
-To receive your bonus for writing your implementation in Scala, you should avoid using **var**s and while/for loops that iterate over collections using [induction variables](https://en.wikipedia.org/wiki/Induction_variable). Instead, you should learn to use collection methods **map**, **flatMap**, **foreach**, **filter** and many others with lambda functions, which make your code linear and easy to understand. Also, avoid mutable variables at all cost. Points will be deducted for having many **var**s and inductive variable loops without explanation why mutation is needed in your code - you can always do without it.
+### Instructions
 
-## Overview
-In this homework, you will create an object-oriented design and implementation of a program that extracts and organizes git repositories data from [Github](https://github.com/). As the first step, you will create [your developer account at Github](https://developer.github.com/v4/) and you will obtain your authorization key. The [Github schema](https://developer.github.com/v4/public_schema/) is publicly available and you will study it to understand the organization of data items on Github and relationships among them. That is, for a given repo, you may obtain the information on all contributors, commits, URL for each commit, the changeset and many other metadata. For a given contributor, you may determine all projects that this contributor participated in and what type of code s/he committed. A part of this homework is that you come up with your own GraphQL queries that will slice and dice the Github schema and you will create a model and object-oriented design of your program based on your model.
+#### Prerequisites
 
-This homework is based on GraphQL and it is a new technology released by Facebook as an open-source software and it is already widely used. There are many resources on the Internet including its [official specification](https://graphql.github.io/graphql-spec/June2018/), [query tools](https://graphcms.com/blog/top-10-graphql-tools-for-2019/), and a [compendium of useful links](https://github.com/chentsulin/awesome-graphql#lib-java) in addition to youtube videos and various documents and examples on [Stackoverflow](https://stackoverflow.com/search?q=graphql). It is beneficial that you learn GraphQL as you go, since it is a simple declarative language that can be nicely intergrated into programs written in object-oriented languages.
+- [SBT](https://www.scala-sbt.org/) installed on your system
+- A [GitHub](https://github.com) Account
+- A [personal access token](https://github.com/settings/tokens) associated with a GitHub account *(No special scopes needed)*
 
-This homework script is written using a retroscripting technique, in which the homework outlines are generally and loosely drawn, and the individual students improvise to create the implementation that fits their refined objectives. In doing so, students are expected to stay within the basic requirements of the homework and they are free to experiments. That is, it is impossible that two non-collaborating students will submit similar homeworks! Asking questions is important, so please ask away at Piazza!
+#### Running the application
 
-## Functionality
-Once you installed and configured your Github developer account, your job is to create various GraphQL queries to understand how the process works. Consider a snippet of the Scala code below that creates a basic HTTP client for Github GraphQL endpoint and serves a basic query and obtains the response. In it, a simple GraphQL query for Github is formed, a connection to the Github endpoint is created, the query is submitted and the response is obtained. Using JSON converters the response is converted into Scala classes. Of course, feel free to experiment and use third-party libraries for your client, but remember that your time is limited and you may not be able to explore the majority of the available tools on the Internet for GraphQL.
-```scala
-val BASE_GHQL_URL = "https://api.github.com/graphql"
-val temp="{viewer {email login url}}"
-implicit val formats = DefaultFormats
+1. Generate a *[personal access token](https://github.com/settings/tokens)* on GitHub, if not already generated. Refer to this [guide](https://help.github.com/en/articles/creating-a-personal-access-token-for-the-command-line) on how to create one. The app works with the *public access* scope, meaning, *no special scopes need to be added** to the token
+2. Clone or download this repository onto your system
+3. Open the Command Prompt (if using Windows) or the Terminal (if using Linux/Mac) and browse to the project directory
+4. Build the project using SBT and run tests
+    
+    ```
+    sbt clean compile test
+    ```
+    
+5. Run the project while passing your **personal access token** as the first *command-line argument*
 
-val client = HttpClientBuilder.create.build
-val httpUriRequest = new HttpPost(BASE_GHQL_URL)
-httpUriRequest.addHeader("Authorization", "Bearer d6150dbc62cdefb310080e1b37008013f46dbbbc")
-httpUriRequest.addHeader("Accept", "application/json")
-val gqlReq = new StringEntity("{\"query\":\"" + temp + "\"}" )
-httpUriRequest.setEntity(gqlReq)
+    ```
+    sbt "run your_personal_access_token_goes_here"
+    ``` 
 
-val response = client.execute(httpUriRequest)
-System.out.println("Response:" + response)
-response.getEntity match {
-    case null => System.out.println("Response entity is null")
-    case x if x != null => {
-      val respJson = fromInputStream(x.getContent).getLines.mkString
-      System.out.println(respJson)
-      val viewer = parse(respJson).extract[Data]
-      System.out.println(viewer)
-      System.out.println(write(viewer))
+6. Follow the prompts to use the application
+
+### Application Design
+
+![Class Diagram](https://mrasto3.people.uic.edu/cs474/hw1/class_diagram.png)
+
+#### The `Query` and `QueryResult` classes
+
+The `Query` class models the payload for making a GraphQL query. The JSON representation of this class forms the payload for sending GraphQL queries to a GraphQL API server. It takes 2 parameters:
+
+1. **`query`**: The GraphQL query.
+2. **`variables`**: A mapping of variable names to their values, for all variables used in the `query`.
+
+ Apart from the above two parameters, the `Query` class also takes in a type parameter `T`, which denotes the `type` of the model class of the expected response from the server as a result of executing this `query`.
+ 
+The `QueryResult` class models a response from a GraphQL API server with a parameter `data` at its root. It also takes a type parameter `T` which specifies the `type` of `data` which is received from the GraphQL server. Its type is same as the type used while creating the `Query`. 
+
+#### The `GraphQLClient` and `GraphQLClient.Builder` classes
+
+The `GraphQLClient` is an HTTP client that can be used to send queries to any server that supports the GraphQL API spec. It takes in 3 parameters:
+
+1. **`apiEndpoint`**: The URL of the GraphQL server.
+2. **`jsonConverter`**: An instance of `JsonConverter` trait that the client will use to use for (de)serializing JSON payloads.
+3. **`headersPopulator`**: A lambda function that returns the headers to be added for a given `Query`. This can be used, for example, to add authentication headers to API calls.
+
+The `executeQuery` method of this class is a generic method that takes an instance of `Query` (with expected `type` of the response), builds an Http request, serializes the `query` to JSON, posts the data to the server, and lastly, deserializes the response to a `QueryResult` with the same type `T` as specified in the `Query`.
+
+The `GraphQLClient` class comes with a *companion object*, which exposes a `GraphQLClient.Builder` instance using the `newBuilder` method. This follows the **Builder** design pattern to let users easily configure and create a new instance of `GraphQLClient`. 
+
+#### The `JsonConverter` and `JsonConverterFactory` traits
+
+The `JsonConverter` trait defines an interface used by the `GraphQLClient` to convert Scala objects to JSON and vice-versa. This allows users to use their favorite JSON (de)serializing library with `GraphQLClient` for performing the JSON conversion.
+
+Moreover, a `JsonConverterFactory` trait is also defined for writing factories for instantiating and configuring a `JsonConverter` using the **Abstract Factory** design pattern.
+
+Three implementations are provided for each of these traits which wrap 3 popular JSON (de)serialization libraries - **Gson**, **Lift-Web JSON**, and **Jackson**. These wrappers ***adapt*** these popular libraries to the `JsonConverter` trait using the **Adapter** design pattern. The configuration of these libraries is taken care of by the corresponding ***factories***.
+
+The use of `JsonConverter` makes the `GraphQLClient` agnostic of the JSON library being used. The dependency for the desired JSON library can be ***injected*** into the `GraphQLClient` using the **dependency injection** design pattern. This is demonstrated more clearly in `JsonConverterTest`, where the `JsonConverterBehavior` defines the test cases for any implementation of `JsonConverter`, and `JsonConverterTest` uses dependency injection to run those tests for all the three implementations of `JsonConverter`. 
+
+The tests for *Gson* and *Lift-Web JSON* were failing due to the problems highlighted below, and have hence been commented.
+
+> **Jackson Scala Module** was chosen the default JSON library for this project since there were issues with the other two libraries - Gson and Lift-Web JSON.
+>
+> **Gson** had two problems. First, it doesn't work with Scala Lists and Maps. Second, it was not able to handle deserialization of nested generic objects, possibly due to type erasure.
+>
+> **Lift-Web JSON** did not provide a way to omit serialization of fields with null values in the resulting JSON. Moreover, and more importantly, it was not able to handle fields in the model objects, during deserialization, that were missing in the input JSON. This was a deal-breaker because the model class could have extra fields which might not be needed to be fetched for a particular query.
+
+#### The GitHub GraphQL API *model* classes
+
+The `com.mayankrastogi.cs474.hw1.github` package contains the model classes for modelling responses from the GitHub GraphQL API. It further divided into the `connections`, `enums`, `interfaces`, and `objects` sub-packages that partially mimic the GitHub GraphQL API schema.
+
+Only models used in the GraphQL queries have been created. The list of fields defined in these models is also not exhaustive and is restricted to the ones that were needed by this application.
+
+#### The `GitHubGraphQLQueries` object
+
+This **Singleton** object provides the definitions of all queries supported by this application, along with the types of results returned by them.
+
+There are two queries defined. Both of these queries take variables for the *search term*, *search type*, *number of results*, and *cursor to next page*.
+
+**For Searching Repositories** *- Returns `Query[RepositorySearchResult]`* 
+
+```graphql
+
+query search($query: String!, $type: SearchType!, $numOfResults: Int!, $nextPageCursor: String) {
+  search(type: $type, query: $query, first: $numOfResults, after: $nextPageCursor) {
+    pageInfo {
+      hasNextPage
+      endCursor
+    }
+    nodes {
+      ... on Repository {
+        name
+        nameWithOwner
+        description
+        watchers {
+          totalCount
+        }
+        stargazers {
+          totalCount
+        }
+        languages(first: 100) {
+          nodes {
+            name
+          }
+        }
+        repositoryTopics(first: 100) {
+          nodes {
+            topic {
+              name
+            }
+          }
+        }
+        sshUrl
+        url
+      }
+    }
   }
 }
+
 ```
 
-Your homework can be divided roughly into five steps. First, you learn how GraphQL-based programs are organized and what your building blocks are for the Github data. I suggest that you load the source code of a GraphQL client into IntelliJ and explore its classes, interfaces, and dependencies and how it interacts with the Github GraphQL endpoint. Second, you create your own model that describes what Github data you want to operate on and for what purpose. You will create various composite objects and define their behavior, e.g., like obtaining git repos where more than one commit happened per week. Next, you will create an implementation of your design where you will use more than TWO different design patterns from the [GoF book](http://wiki.c2.com/?DesignPatternsBook). Fourth, you will create multiple unit tests using [JUnit framework](https://junit.org/junit5/). Finally, you will run your program, measure the CPU and memory usages using Java tools and collect execution logs. 
+**For Searching Users** *- Returns `Query[UserSearchResult]`*
 
-## Baseline
-To be considered for grading, your project should include at least one of your own written programs in Java or Scala (i.e., not copied examples where you renamed variables or refactored them similarly), your project should be buildable using the SBT or the Gradle, and your documentation must specify how you create and evaluate your models. Your documentation must include your design and model, the reasoning about pros and cons, explanations of your implementation and the chosen design patterns, and the results of your runs, the measurement of the runtime parameters of the program (e.g., CPU and RAM utilization). Simply copying some open-source Java programs from examples and modifying them a bit (e.g., rename some variables) will result in desk-rejecting your submission.
+```graphql
 
-## Piazza collaboration
-You can post questions and replies, statements, comments, discussion, etc. on Piazza. For this homework, feel free to share your ideas, mistakes, code fragments, commands from scripts, and some of your technical solutions with the rest of the class, and you can ask and advise others using Piazza on where resources and sample programs can be found on the internet, how to resolve dependencies and configuration issues. When posting question and answers on Piazza, please select the appropriate folder, i.e., hw1 to ensure that all discussion threads can be easily located. Active participants and problem solvers will receive bonuses from the big brother :-) who is watching your exchanges on Piazza (i.e., your class instructor and your TA). However, *you must not describe your design or specific details related how your construct your models!*
+query search($query: String!, $type: SearchType!, $numOfResults: Int!, $nextPageCursor: String) {
+  search(type: $type, query: $query, first: $numOfResults, after: $nextPageCursor) {
+    pageInfo {
+      hasNextPage
+      endCursor
+    }
+    nodes {
+      ... on User {
+        name
+        login
+        location
+        bio
+        url
+        followers {
+          totalCount
+        }
+        following {
+          totalCount
+        }
+        repositories(first: 100) {
+          nodes {
+            languages(first: 100) {
+              nodes {
+                name
+              }
+            }
+            repositoryTopics(first: 100) {
+              nodes {
+                topic {
+                  name
+                }
+              }
+            }
+          }
+          totalCount
+        }
+        repositoriesContributedTo(first: 100) {
+          nodes {
+            languages(first: 100) {
+              nodes {
+                name
+              }
+            }
+            repositoryTopics(first: 100) {
+              nodes {
+                topic {
+                  name
+                }
+              }
+            }
+          }
+          totalCount
+        }
+      }
+    }
+  }
+}
 
-## Git logistics
-**This is an individual homework.** Separate repositories will be created for each of your homeworks and for the course project. You will find a corresponding entry for this homework at  https://bitbucket.org/cs474_fall2019/homework1.git. You will fork this repository and your fork will be private, no one else besides you, the TA and your course instructor will have access to your fork. Please remember to grant a read access to your repository to your TA and your instructor. In future, for the team homeworks and the course project, you should grant the write access to your forkmates, but NOT for this homework. You can commit and push your code as many times as you want. Your code will not be visible and it should not be visible to other students (except for your forkmates for a team project, but not for this homework). When you push the code into the remote repo, your instructor and the TA will see your code in your separate private fork. Making your fork public or inviting other students to join your fork for an individual homework will result in losing your grade. For grading, only the latest push timed before the deadline will be considered. **If you push after the deadline, your grade for the homework will be zero**. For more information about using the Git and Bitbucket specifically, please use this [link as the starting point](https://confluence.atlassian.com/bitbucket/bitbucket-cloud-documentation-home-221448814.html). For those of you who struggle with the Git, I recommend a book by Ryan Hodson on Ry's Git Tutorial. The other book called Pro Git is written by Scott Chacon and Ben Straub and published by Apress and it is [freely available](https://git-scm.com/book/en/v2/). There are multiple videos on youtube that go into details of the Git organization and use.
+```
 
-Please follow this naming convention while submitting your work : "Firstname_Lastname_hw1" without quotes, where you specify your first and last names **exactly as you are registered with the University system**, so that we can easily recognize your submission. I repeat, make sure that you will give both your TA and the course instructor the read/write access to your *private forked repository* so that we can leave the file feedback.txt with the explanation of the grade assigned to your homework.
+#### The `GitHubSearchApp` and the `GitHubSearchAppUtils` objects
 
-## Discussions and submission
-As it is mentioned above, you can post questions and replies, statements, comments, discussion, etc. on Piazza. Remember that you cannot share your code and your solutions privately, but you can ask and advise others using Piazza and StackOverflow or some other developer networks where resources and sample programs can be found on the Internet, how to resolve dependencies and configuration issues. Yet, your implementation should be your own and you cannot share it. Alternatively, you cannot copy and paste someone else's implementation and put your name on it. Your submissions will be checked for plagiarism. **Copying code from your classmates or from some sites on the Internet will result in severe academic penalties up to the termination of your enrollment in the University**. When posting question and answers on Piazza, please select the appropriate folder, i.e., hw1 to ensure that all discussion threads can be easily located.
+The `GitHubSearchApp` is the **main** class of the program and provides a menu-based command-line user interface for searching GitHub for users and repositories.
+
+It accepts the *GitHub personal access token* as the first command-line argument, loads the configuration from the Typesafe config files using the `Settings` utility, creates a `GraphQLClient` for GitHub GraphQL API with the help of `GitHubSearchAppUtils` object, asks the user what to search, executes the query, and prints the results while allowing the user to page through the results.
+
+The `createGitHubGraphQLClient` method defined in the `GitHubSearchAppUtils` object creates a new `GraphQLClient` using the **Builder** design pattern, and configures it for querying GitHub's GraphQL API. It is also responsible for defining that the authorization header, with the provided personal access token, should be added to all the HTTP requests sent to the GitHub GraphQL API server. The `GitHubSearchAppUtilsTest` provides a test case for verifying that the `GraphQLClient` created by this method is configured properly. 
+
+### Output and Performance ###
+
+#### Search for user "Mayank Rastogi"
+
+```text
+
+===============================================================================================================
+                                         GitHub Search Application
+===============================================================================================================
+This application allows you to search for users or repositories on GitHub.
+
+First choose what you want to search (Users or Repositories) and then specify the search term. You will be able
+to page through the results by entering 'N' to go to the next page. The number of results to show in a page can
+be configured using the "github-graphql-client.number-of-results-in-page" setting in the config file.
+
+---------------------------------------------------------------------------------------------------------------
 
 
-## Submission deadline and logistics
-Wednesday, October 2 at 3AM CST via the bitbucket repository. Your submission will include the code for the program, your documentation with instructions and detailed explanations on how to assemble and deploy your program along with the results of your simulation and a document that explains these results based on the characteristics and the parameters of your models, and what the limitations of your implementation are. Again, do not forget, please make sure that you will give both your TAs and your instructor the read access to your private forked repository. Your name should be shown in your README.md file and other documents. Your code should compile and run from the command line using the commands **sbt clean compile test** and **sbt clean compile run** or the corresponding commands for Gradle. Also, you project should be IntelliJ friendly, i.e., your graders should be able to import your code into IntelliJ and run from there. Use .gitignore to exlude files that should not be pushed into the repo.
+What do you want to search?
+
+1. Users
+2. Repositories
+0. Exit
+
+Please enter your choice:
+1
+Please enter your search term:
+Mayank Rastogi
 
 
-## Evaluation criteria
-- the maximum grade for this homework is 7% with the bonus up to 3%. Points are subtracted from this maximum grade: for example, saying that 2% is lost if some requirement is not completed means that the resulting grade will be 7%-2% => 5%; if the core homework functionality does not work, no bonus points will be given;
-- only some POJO classes are created and nothing else is done: up to 7% lost;
-- having less than five unit and/or integration tests: up to 5% lost;
-- missing comments and explanations from the submitted program: up to 5% lost;
-- logging is not used in your programs: up to 3% lost;
-- hardcoding the input values in the source code instead of using the suggested configuration libraries: up to 4% lost;
-- no instructions in README.md on how to install and run your program: up to 5% lost;
-- the program crashes without completing the core functionality: up to 3% lost;
-- no design and modeling documentation exists that explains your choices: up to 6% lost;
-- the deployment documentation exists but it is insufficient to understand how you assembled and deployed all components of the program: up to 5% lost;
-- the minimum grade for this homework cannot be less than zero.
+Name: Mayank K Rastogi
+Username: mayankrastogi
+Bio: Programmer | Full-stack developer | Gamer
+Followers: 9
+Following: 6
+Repositories Owned: 17
+Repositories Collaborated On: 1
+Languages Used: JavaScript, Shell, CSS, Scala, C#, Python, ShaderLab, Jupyter Notebook, C, HTML, Smalltalk, GLSL, Mask, Java, Dockerfile
+Topics Interested In: cloudsim-plus, grpc-java, personal-website, hr-management-system, typesafe-config, jekyll, scalatest, grpc, graphviz, aws-emr, logback, chess, unity3d, arcade-game, room-scale-vr, sbt-multi-project, scikit-learn, mapreduce, junit, hadoop-mapreduce, capstan, blender, rest-api, osv, inlineedit, osv-openjdk8, java-rmi, protobuf, cloudsim, aws-lambda, java, html-table, vrtk, virtual-reality, augmented-reality, jupyter-notebook, docker, sbt, hadoop, spark, xml, ibm-db2, inline-editing, halloween, scala, pandas, spring-boot, libgdx, unikernel, platform-game, python, jquery, classification, flash, numpy, aws-api-gateway, vuforia, ibm-websphere-portal, cloud-computing, machine-learning, java-ee, game, jquery-plugin, virtual-appliance, markdown
+Profile URL: https://github.com/mayankrastogi
 
-That's it, folks!
+
+Name: Mayank Rastogi
+Username: mrast2
+Bio: null
+Followers: 0
+Following: 1
+Repositories Owned: 3
+Repositories Collaborated On: 0
+Languages Used: JavaScript, CSS, C#, XSLT, HTML, ASP
+Topics Interested In: 
+Profile URL: https://github.com/mrast2
+
+
+Name: Mayank Rastogi
+Username: rastogi-mayank
+Bio: 
+Followers: 0
+Following: 0
+Repositories Owned: 1
+Repositories Collaborated On: 0
+Languages Used: PLSQL, JavaScript, Shell, CSS, Groovy, Batchfile, PLpgSQL, SQLPL, HTML, Java, Dockerfile
+Topics Interested In: 
+Profile URL: https://github.com/rastogi-mayank
+
+
+Name: Mayank Rastogi
+Username: mayankrastogi99
+Bio: 
+Followers: 0
+Following: 0
+Repositories Owned: 1
+Repositories Collaborated On: 1
+Languages Used: 
+Topics Interested In: 
+Profile URL: https://github.com/mayankrastogi99
+
+
+Process finished with exit code 0
+
+```
+
+![User Search Performance](https://mrasto3.people.uic.edu/cs474/hw1/01.png)
+
+#### Search for repository "Cloud Simulation" *(Showing 2 pages of results)*
+
+```text
+
+===============================================================================================================
+                                         GitHub Search Application
+===============================================================================================================
+This application allows you to search for users or repositories on GitHub.
+
+First choose what you want to search (Users or Repositories) and then specify the search term. You will be able
+to page through the results by entering 'N' to go to the next page. The number of results to show in a page can
+be configured using the "github-graphql-client.number-of-results-in-page" setting in the config file.
+
+---------------------------------------------------------------------------------------------------------------
+
+
+What do you want to search?
+
+1. Users
+2. Repositories
+0. Exit
+
+Please enter your choice:
+2
+Please enter your search term:
+Cloud Simulation
+
+Name: cloudsim
+Owner: Cloudslab
+Description: CloudSim: A Framework For Modeling And Simulation Of Cloud Computing Infrastructures And Services
+Watchers: 50
+Stargazers: 305
+Languages: Java
+Topics: 
+GitHub URL: https://github.com/Cloudslab/cloudsim
+Clone URL: git@github.com:Cloudslab/cloudsim.git
+
+
+Name: CloudReports
+Owner: thiagotts
+Description: An extensible simulation tool for energy-aware cloud computing environments
+Watchers: 8
+Stargazers: 31
+Languages: Shell, Java, JavaScript, CSS, HTML
+Topics: 
+GitHub URL: https://github.com/thiagotts/CloudReports
+Clone URL: git@github.com:thiagotts/CloudReports.git
+
+
+Name: cloudsim-plus
+Owner: manoelcampos
+Description: A modern, full-featured, highly extensible and easier-to-use Java 8+ Framework for Cloud Computing Simulation
+Watchers: 17
+Stargazers: 107
+Languages: Shell, Java
+Topics: simulation-framework, cloud-computing, cloud-simulation, research, cloud-infrastructure, simulation, java, java8, test-bed, iaas, paas, saas, cloudsim, trace, google-cluster-data, workload, cloudsimplus, auto-scaling, load-balancing
+GitHub URL: https://github.com/manoelcampos/cloudsim-plus
+Clone URL: git@github.com:manoelcampos/cloudsim-plus.git
+
+
+Name: CloudSimPy
+Owner: RobertLexis
+Description: CloudSimPy: Datacenter job scheduling simulation framework
+Watchers: 0
+Stargazers: 41
+Languages: Python
+Topics: cloud, reinforcement-learning, job-scheduling-algorithm, datacenter, schedule
+GitHub URL: https://github.com/RobertLexis/CloudSimPy
+Clone URL: git@github.com:RobertLexis/CloudSimPy.git
+
+
+Name: pycles
+Owner: pressel
+Description: A python based infrastructure for cloud large eddy simulation. 
+Watchers: 15
+Stargazers: 58
+Languages: C, Python, Shell, Fortran, C++
+Topics: 
+GitHub URL: https://github.com/pressel/pycles
+Clone URL: git@github.com:pressel/pycles.git
+
+
+Enter anything to show next page of results. Enter 'Q' to quit:
+N
+
+Name: firesim
+Owner: firesim
+Description: FireSim: Easy-to-use, Scalable, FPGA-accelerated Cycle-accurate Hardware Simulation in the Cloud
+Watchers: 46
+Stargazers: 253
+Languages: Shell, Python, Makefile, Assembly, Scala, C++, Verilog, C, Batchfile
+Topics: fpga, risc-v, simulation, datacenter, hardware, firesim, rocket-chip, boom, cloud
+GitHub URL: https://github.com/firesim/firesim
+Clone URL: git@github.com:firesim/firesim.git
+
+
+Name: cloudsimsdn
+Owner: Cloudslab
+Description: CloudSimSDN is an SDN extension of CloudSim project to simulate SDN features in the context of a cloud data center.
+Watchers: 9
+Stargazers: 35
+Languages: Java
+Topics: cloudsim, sdn, simulation, cloud, data-center, vms, workload, vm-creation
+GitHub URL: https://github.com/Cloudslab/cloudsimsdn
+Clone URL: git@github.com:Cloudslab/cloudsimsdn.git
+
+
+Name: HPCCloud
+Owner: Kitware
+Description: A Cloud/Web-Based Simulation  Environment
+Watchers: 10
+Stargazers: 35
+Languages: JavaScript, HTML, Python, Shell, CMake
+Topics: simulation-environment, cloud, hpc
+GitHub URL: https://github.com/Kitware/HPCCloud
+Clone URL: git@github.com:Kitware/HPCCloud.git
+
+
+Name: simgrid
+Owner: simgrid
+Description: Framework for the simulation of distributed applications (Clouds, HPC, Grids, IoT and others)
+Watchers: 15
+Stargazers: 84
+Languages: TeX, CMake, Perl, Shell, C, C++, R, Python, Java, Objective-C, Fortran, Lex, Yacc, TLA, Roff, XSLT, sed, Makefile
+Topics: 
+GitHub URL: https://github.com/simgrid/simgrid
+Clone URL: git@github.com:simgrid/simgrid.git
+
+
+Name: CSF
+Owner: jianboqi
+Description: LiDAR point cloud ground filtering / segmentation (bare earth extraction) method based on cloth simulation
+Watchers: 11
+Stargazers: 62
+Languages: C++, MATLAB, Python, Makefile, CMake
+Topics: 
+GitHub URL: https://github.com/jianboqi/CSF
+Clone URL: git@github.com:jianboqi/CSF.git
+
+
+Enter anything to show next page of results. Enter 'Q' to quit:
+Q
+
+Process finished with exit code 0
+
+```
+
+![Repository Search Performance](https://mrasto3.people.uic.edu/cs474/hw1/02.png)
