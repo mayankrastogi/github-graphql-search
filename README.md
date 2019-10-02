@@ -21,7 +21,7 @@ The application design leverages the use of **Builder**, **Factory**, **Adapter*
 
 #### Running the application
 
-1. Generate a *[personal access token](https://github.com/settings/tokens)* on GitHub, if not already generated. Refer to this [guide](https://help.github.com/en/articles/creating-a-personal-access-token-for-the-command-line) on how to create one. The app works with the *public access* scope, meaning, *no special scopes need to be added** to the token
+1. Generate a *[personal access token](https://github.com/settings/tokens)* on GitHub, if not already generated. Refer to this [guide](https://help.github.com/en/articles/creating-a-personal-access-token-for-the-command-line) on how to create one. The app works with the *public access* scope, meaning, *no special scopes need to be added* to the token
 2. Clone or download this repository onto your system
 3. Open the Command Prompt (if using Windows) or the Terminal (if using Linux/Mac) and browse to the project directory
 4. Build the project using SBT and run tests
